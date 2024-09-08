@@ -1,0 +1,94 @@
+import os
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import pandas as pd
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.model_selection import train_test_split
+
+# Load in Data
+mnist = keras.datasets.mnist
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+X_train = keras.utils.normalize(X_train, axis=1)
+X_test = keras.utils.normalize(X_test, axis=1)
+
+X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=.2, random_state=0)
+
+# ======================MODEL BUILDING=========================
+model = keras.Sequential([
+    # Convolutional base
+    layers.InputLayer(input_shape=(28, 28, 1)),
+
+
+    # Block One
+    layers.BatchNormalization(),
+    layers.Conv2D(filters=64, kernel_size=3, activation='relu', padding='same'),
+    layers.MaxPool2D(),
+
+    # Block Two
+    layers.BatchNormalization(),
+    layers.Conv2D(filters=128, kernel_size=3, activation='relu', padding='same'),
+    layers.MaxPool2D(),
+
+    # Block Three
+    layers.BatchNormalization(),
+    layers.Conv2D(filters=256, kernel_size=3, activation='relu', padding='same'),
+    layers.MaxPool2D(),
+
+    # Head
+    layers.BatchNormalization(),
+    layers.Flatten(),
+    layers.Dense(8, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+early_stopping = EarlyStopping(
+    min_delta=.001,
+    patience=3,
+    restore_best_weights=True
+)
+
+
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['sparse_categorical_accuracy']
+)
+
+
+
+history = model.fit(
+    X_train, y_train, 
+    validation_data=(X_valid, y_valid),
+    callbacks=[early_stopping],
+    epochs=30
+)
+history_frame = pd.DataFrame(history.history)
+history_frame
+
+history_frame.loc[:, ['loss', 'val_loss']].plot()
+history_frame.loc[:, ['sparse_categorical_accuracy', 'val_sparse_categorical_accuracy']].plot()
+
+
+
+
+model.save('handwritten.keras')
+
+model = keras.models.load_model('handwritten.keras')
+
+
+
+
+# ===================MODEL EVALUTION===================
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f'loss: {loss}')
+print(f'accuracy: {accuracy}')
+print(hello)
+
+# Best scores: 
+# loss: 0.04188231751322746
+# accuracy: 0.9879999756813049
