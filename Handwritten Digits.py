@@ -8,6 +8,7 @@ from tensorflow.keras import layers
 import pandas as pd
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
+from PIL import Image, ImageOps
 
 # Load in Data
 mnist = keras.datasets.mnist
@@ -87,11 +88,34 @@ model = keras.models.load_model('handwritten.keras')
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f'loss: {loss}')
 print(f'accuracy: {accuracy}')
-print(hello)
 
 # Best scores: 
 # loss: 0.04188231751322746
 # accuracy: 0.9879999756813049
 
 
-print('Is this shit working?')
+
+
+# ===================PREDICTION===================
+digits = r"C:\Users\tkdav\OneDrive\Personal Projects\CNN-MNIST-Digit-Classification\digits"
+
+for image in os.listdir(digits):
+    img_path = os.path.join(digits, image)
+    img = Image.open(img_path).convert('L')
+
+    img = ImageOps.fit(img, (28, 28), method=Image.LANCZOS, centering=(.5, .5))
+
+    img = np.array(img)
+    img = img.astype('float32') / 255.0
+    img = np.expand_dims(img, axis=-1)
+    img = np.expand_dims(img, axis=0)
+
+    # Make a prediction
+    prediction = model.predict(img)
+    predicted_class = np.argmax(prediction)
+
+    # Display the image and the model's prediction
+    plt.imshow(img[0], cmap='gray')
+    plt.title(f'Model Prediction: {predicted_class}')
+    plt.show()
+
