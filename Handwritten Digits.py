@@ -20,10 +20,17 @@ X_test = keras.utils.normalize(X_test, axis=1)
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=.2, random_state=0)
 
 # ======================MODEL BUILDING=========================
+def invert_image(image):
+    image = tf.cast(image * 255, tf.uint8)
+    inverted_image = tf.numpy_function(np.invert, [image], tf.uint8)
+    inverted_image = tf.ensure_shape(inverted_image, image.shape)
+    return tf.cast(inverted_image, tf.float32) / 255.0
+
 model = keras.Sequential([
     # Convolutional base
     layers.InputLayer(input_shape=(28, 28, 1)),
 
+    layers.Lambda(lambda x: tf.where(tf.random.uniform([]) > .5, invert_image(x), x)),
 
     # Block One
     layers.BatchNormalization(),
@@ -105,7 +112,7 @@ for image in os.listdir(digits):
 
     img = ImageOps.fit(img, (28, 28), method=Image.LANCZOS, centering=(.5, .5))
 
-    img = np.array(img)
+    img = np.invert(np.array(img))
     img = img.astype('float32') / 255.0
     img = np.expand_dims(img, axis=-1)
     img = np.expand_dims(img, axis=0)
