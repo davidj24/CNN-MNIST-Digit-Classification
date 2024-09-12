@@ -92,3 +92,6 @@ print(hello)
 # Best scores: 
 # loss: 0.04188231751322746
 # accuracy: 0.9879999756813049
+
+
+print('Is this shit working?')
