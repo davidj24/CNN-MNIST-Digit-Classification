@@ -126,3 +126,7 @@ for image in os.listdir(digits):
     plt.title(f'Model Prediction: {predicted_class}')
     plt.show()
 
+
+    #LALALAA
+    print('WORKKKK')
+
