@@ -1,5 +1,5 @@
 import os
-import cv2
+# import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -30,22 +30,25 @@ model = keras.Sequential([
     # Convolutional base
     layers.InputLayer(input_shape=(28, 28, 1)),
 
-    layers.Lambda(lambda x: tf.where(tf.random.uniform([]) > .5, invert_image(x), x)),
+    # layers.Lambda(lambda x: tf.where(tf.random.uniform([]) > .5, invert_image(x), x)),
 
     # Block One
     layers.BatchNormalization(),
     layers.Conv2D(filters=64, kernel_size=3, activation='relu', padding='same'),
     layers.MaxPool2D(),
+    layers.Dropout(.3),
 
     # Block Two
     layers.BatchNormalization(),
     layers.Conv2D(filters=128, kernel_size=3, activation='relu', padding='same'),
     layers.MaxPool2D(),
+    layers.Dropout(.3),
 
     # Block Three
     layers.BatchNormalization(),
     layers.Conv2D(filters=256, kernel_size=3, activation='relu', padding='same'),
     layers.MaxPool2D(),
+    layers.Dropout(.3),
 
     # Head
     layers.BatchNormalization(),
@@ -104,7 +107,7 @@ print(f'accuracy: {accuracy}')
 
 
 # ===================PREDICTION===================
-digits = r"C:\Users\tkdav\OneDrive\Personal Projects\CNN-MNIST-Digit-Classification\digits"
+digits = r"/Users/hanj/CNN-MNIST-Digit-Classification/digits"
 
 for image in os.listdir(digits):
     img_path = os.path.join(digits, image)
@@ -112,7 +115,7 @@ for image in os.listdir(digits):
 
     img = ImageOps.fit(img, (28, 28), method=Image.LANCZOS, centering=(.5, .5))
 
-    img = np.invert(np.array(img))
+    img = np.array(img)
     img = img.astype('float32') / 255.0
     img = np.expand_dims(img, axis=-1)
     img = np.expand_dims(img, axis=0)
@@ -126,7 +129,4 @@ for image in os.listdir(digits):
     plt.title(f'Model Prediction: {predicted_class}')
     plt.show()
 
-
-    #LALALAA
-    print('WORKKKK')
-
+print('hellooo')
