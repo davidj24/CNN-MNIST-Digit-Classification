@@ -1,5 +1,5 @@
 import os
-# import cv2
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -50,6 +50,12 @@ model = keras.Sequential([
     layers.MaxPool2D(),
     layers.Dropout(.3),
 
+    # Block Four
+    layers.BatchNormalization(),
+    layers.Conv2D(filters=512, kernel_size=3, activation='relu', padding='same'),
+    layers.MaxPool2D(),
+    layers.Dropout(.3),
+
     # Head
     layers.BatchNormalization(),
     layers.Flatten(),
@@ -87,9 +93,9 @@ history_frame.loc[:, ['sparse_categorical_accuracy', 'val_sparse_categorical_acc
 
 
 
-model.save('handwritten.keras')
+# model.save('handwritten.keras')
 
-model = keras.models.load_model('handwritten.keras')
+# model = keras.models.load_model('handwritten.keras')
 
 
 
@@ -107,7 +113,8 @@ print(f'accuracy: {accuracy}')
 
 
 # ===================PREDICTION===================
-digits = r"/Users/hanj/CNN-MNIST-Digit-Classification/digits"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+digits = os.path.join(current_dir, 'digits')
 
 for image in os.listdir(digits):
     img_path = os.path.join(digits, image)
@@ -125,8 +132,9 @@ for image in os.listdir(digits):
     predicted_class = np.argmax(prediction)
 
     # Display the image and the model's prediction
+    plt.figure(figsize=(2, 2))
     plt.imshow(img[0], cmap='gray')
     plt.title(f'Model Prediction: {predicted_class}')
     plt.show()
 
-print('hellooo')
+
