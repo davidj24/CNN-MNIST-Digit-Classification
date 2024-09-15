@@ -19,7 +19,7 @@ X_test = keras.utils.normalize(X_test, axis=1)
 
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=.2, random_state=0)
 
-# ======================MODEL BUILDING=========================
+# =============================MODEL BUILDING=====================================
 def invert_image(image):
     image = tf.cast(image * 255, tf.uint8)
     inverted_image = tf.numpy_function(np.invert, [image], tf.uint8)
@@ -59,7 +59,8 @@ model = keras.Sequential([
     # Head
     layers.BatchNormalization(),
     layers.Flatten(),
-    layers.Dense(8, activation='relu'),
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(.3),
     layers.Dense(10, activation='softmax')
 ])
 
@@ -93,21 +94,21 @@ history_frame.loc[:, ['sparse_categorical_accuracy', 'val_sparse_categorical_acc
 
 
 
-# model.save('handwritten.keras')
+model.save('handwritten.keras')
 
 # model = keras.models.load_model('handwritten.keras')
 
 
 
 
-# ===================MODEL EVALUTION===================
+# =========================================MODEL EVALUTION===================================
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f'loss: {loss}')
 print(f'accuracy: {accuracy}')
 
 # Best scores: 
-# loss: 0.04188231751322746
-# accuracy: 0.9879999756813049
+# loss: 0.026175716891884804
+# accuracy: 0.9922999739646912
 
 
 
@@ -117,6 +118,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 digits = os.path.join(current_dir, 'digits')
 
 for image in os.listdir(digits):
+    if not image.endswith(('.png', '.jpg', '.jpeg')):
+        continue
     img_path = os.path.join(digits, image)
     img = Image.open(img_path).convert('L')
 
@@ -132,9 +135,9 @@ for image in os.listdir(digits):
     predicted_class = np.argmax(prediction)
 
     # Display the image and the model's prediction
-    plt.figure(figsize=(2, 2))
+    plt.figure(figsize=(1, 1))
     plt.imshow(img[0], cmap='gray')
     plt.title(f'Model Prediction: {predicted_class}')
     plt.show()
 
-
+# Currently gets wrong: 1 at ind8, 0 at ind14, 4 at ind 32, 2 at ind34, 1 at ind41,
